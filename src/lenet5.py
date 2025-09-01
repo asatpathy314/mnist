@@ -33,15 +33,6 @@ class ScaledTanh(nn.Module):
     def forward(self, x):
         return self.A * torch.tanh(self.S * x)
 
-class Pad32(nn.Module):
-    """Pad 28x28 -> 32x32 with background value -0.1."""
-    def __init__(self, pad=2, value=-0.1):
-        super().__init__()
-        self.pad, self.value = pad, value
-
-    def forward(self, x):
-        return F.pad(x, (self.pad, self.pad, self.pad, self.pad), value=self.value)
-
 class Cx(nn.Module):
     def __init__(self, in_channels, out_channels, kernel_size, stride):
         super().__init__()
@@ -98,10 +89,15 @@ class RBFClassifier(nn.Module):
     """
     Euclidean RBF output layer (one prototype per class).
     Returns negative squared distances so CrossEntropyLoss can be used.
+    Prototypes are initialized to +-1 with equal probability.
+    The paper calls for initializing the logits to represent the bitmap
+    of a 7 x 12 number. This is done for a variety of reasons in the actual paper.
+    But here we just choose another viable option.
     """
     def __init__(self, in_features, num_classes):
         super().__init__()
-        self.prototypes = nn.Parameter(torch.zeros(num_classes, in_features))
+        # Initialize prototypes to +-1 with equal probability
+        self.prototypes = nn.Parameter((torch.randint(0, 2, (num_classes, in_features)) * 2 - 1).float())
 
     def forward(self, x):  # x: (N, in_features)
         # logits = -(||x||^2 - 2 x*w^T + ||w||^2)
@@ -113,7 +109,6 @@ class RBFClassifier(nn.Module):
 class LeNet5(nn.Module):
     def __init__(self, use_rbf=True, num_classes=10):
         super().__init__()
-        self.pad32 = Pad32(pad=2, value=-0.1)
         self.c1  = Cx(in_channels=1, out_channels=6, kernel_size=5, stride=1)
         self.s2  = Sx(channels=6, kernel_size=2, stride=2)
         self.c3  = nn.Sequential(
@@ -128,7 +123,6 @@ class LeNet5(nn.Module):
         self.out = RBFClassifier(84, num_classes)
 
     def forward(self, x):
-        x = self.pad32(x)
         x = self.c1(x)
         x = self.s2(x)
         x = self.c3(x)

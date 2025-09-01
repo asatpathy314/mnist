@@ -3,7 +3,7 @@ from torch.optim.optimizer import Optimizer
 
 class DiagLM(Optimizer):
     """
-    Stochastic Diagonal Levenberg–Marquardt (LeCun-style).
+    Stochastic Diagonal Levenberg–Marquardt
     Update: p <- p - lr * grad / (mu + v)
     where v is an EMA of grad**2 (diag-Hessian proxy).
 
@@ -35,8 +35,6 @@ class DiagLM(Optimizer):
                 if p.grad is None:
                     continue
                 grad = p.grad
-                if grad.is_sparse:
-                    raise RuntimeError("DiagLM does not support sparse gradients")
 
                 # Optional L2
                 if wd != 0.0:

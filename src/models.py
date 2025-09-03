@@ -64,7 +64,7 @@ class Sx(nn.Module):
         super().__init__()
         self.a = nn.Parameter(torch.ones(channels))
         self.b = nn.Parameter(torch.zeros(channels))
-        self.pool = nn.AvgPool2d(kernel_size=kernel_size, stride=stride, divisor_override=1)
+        self.pool = nn.AvgPool2d(kernel_size=kernel_size, stride=stride)
         self.act  = ScaledTanh()
 
     def forward(self, x):

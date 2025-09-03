@@ -9,8 +9,8 @@ class DiagLM(Optimizer):
 
     Args:
         params: iterable of parameters
-        lr: global step scale ε
-        mu: damping term μ (keeps steps finite)
+        lr: global step scale epsilon
+        mu: damping term mu (keeps steps finite)
         beta: EMA factor for the squared gradients (0.95–0.995 work well)
         weight_decay: L2 penalty added to the grad (coupled)
     """

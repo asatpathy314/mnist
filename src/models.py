@@ -106,7 +106,7 @@ class RBFClassifier(nn.Module):
         return -(x2 - 2*xw + w2)
 
 class LeNet5(nn.Module):
-    def __init__(self, use_rbf=True, num_classes=10):
+    def __init__(self, use_rbf: bool = True, num_classes: int = 10):
         super().__init__()
         self.c1  = Cx(in_channels=1, out_channels=6, kernel_size=5, stride=1)
         self.s2  = Sx(channels=6, kernel_size=2, stride=2)
@@ -119,7 +119,8 @@ class LeNet5(nn.Module):
         self.flatten = nn.Flatten()
         self.f6 = nn.Linear(120, 84)
         self.act = ScaledTanh()
-        self.out = RBFClassifier(84, num_classes)
+        self.use_rbf = use_rbf
+        self.out = RBFClassifier(84, num_classes) if use_rbf else nn.Linear(84, num_classes)
 
     def forward(self, x):
         x = self.c1(x)

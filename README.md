@@ -35,6 +35,15 @@ mnist/
 ## Citation
 If you use this code, please cite the original LeNet-5 paper:
 
+## Results
+Currently our network returns
+
+## Future Work
+In the original paper, they state:
+> "The parameter vectors of these units were chosen by hand and kept fixed (at least initially). [...] they were instead designed to represent a stylized image of the corresponding character classdrawn on a 7x12 bitmap."
+
+Currently the RBF unit initializes randomly with 0s and 1s. In future extensions of this work I may implement this.
+
 ```
 @article{lecun1998gradient,
   title={Gradient-based learning applied to document recognition},

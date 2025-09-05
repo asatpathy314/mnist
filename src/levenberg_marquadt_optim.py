@@ -5,7 +5,7 @@ class DiagLM(Optimizer):
     """
     Stochastic Diagonal Levenberg–Marquardt
     Update: p <- p - lr * grad / (mu + v)
-    where v is an EMA of grad**2 (diag-Hessian proxy).
+    where v is an EMA of grad**2 (diag-Hessian proxy as reccomended by LeCun et al. 1998).
 
     Args:
         params: iterable of parameters

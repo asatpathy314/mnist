@@ -13,9 +13,11 @@ def main():
     parser = argparse.ArgumentParser(description="Train/Eval harness for LeNet5 on MNIST")
     parser.add_argument("--epochs", type=int, default=5)
     parser.add_argument("--batch-size", type=int, default=256)
-    parser.add_argument("--lr", type=float, default=0.05)
+    parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--device", type=str, default="auto", help="cpu|mps|cuda|auto")
     parser.add_argument("--root", type=str, default=".")
+    parser.add_argument("--optimizer", type=str, default="adam", choices=["adam", "sgd", "diaglm"]) 
+    parser.add_argument("--linear-head", action="store_true", help="Use linear classifier head instead of RBF")
     args = parser.parse_args()
 
     if args.device == "auto":
@@ -30,10 +32,15 @@ def main():
 
     train_loader, test_loader = get_dataloaders(batch_size=args.batch_size, root=args.root)
 
-    model = LeNet5().to(device)
+    model = LeNet5(use_rbf=(not args.linear_head)).to(device)
     model.apply(lenet5_init_)
     loss_fn = nn.CrossEntropyLoss()
-    optimizer = DiagLM(model.parameters(), lr=args.lr)
+    if args.optimizer == "adam":
+        optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
+    elif args.optimizer == "sgd":
+        optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, momentum=0.9)
+    else:
+        optimizer = DiagLM(model.parameters(), lr=args.lr)
 
     preprocess = lambda x: F.pad(x, (2, 2, 2, 2))
 
